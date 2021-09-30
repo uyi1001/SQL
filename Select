@@ -1,0 +1,8 @@
+/****** Script for SelectTopNRows command from SSMS  ******/
+SELECT TOP (1000) [Id]
+      ,[EmployeeID]
+      ,[Name]
+      ,[Description]
+  FROM [FirstTestDB].[dbo].[TblCourses]
+
+#Select order
