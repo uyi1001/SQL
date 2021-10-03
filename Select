@@ -6,3 +6,11 @@ SELECT TOP (1000) [Id]
   FROM [FirstTestDB].[dbo].[TblCourses]
 
 #Select order
+
+
+USE NBA;
+GO
+SELECT player.[Full Name],player.[Team] as Team
+FROM Player
+ORDER BY player.[Full Name] ASC;
+GO
