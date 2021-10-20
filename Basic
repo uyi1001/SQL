@@ -1,0 +1,60 @@
+/****** Script for SelectTopNRows command from SSMS  ******/
+SELECT TOP (1000) [Id]
+      ,[EmployeeID]
+      ,[Name]
+      ,[Description]
+  FROM [FirstTestDB].[dbo].[TblCourses]
+
+#Select order
+
+
+USE NBA;
+GO
+SELECT player.[Full Name],player.[Team] as Team
+FROM Player
+ORDER BY player.[Full Name] ASC;
+GO
+
+
+CREATE DATABASE testdatabase;
+
+USE testdatabase;
+
+DROP DATABASE testdatabase;
+
+CREATE TABLE tablename(column_1 datatype,
+                       column_2 datatype,
+                       ...
+                       column_n datatype,
+                       PRIMARY KEY(column_x));
+
+DROP TABLE tablename;
+
+SELECT * FROM tablename;
+
+SELECT column_1, column_2... FROM tablename;
+
+SELECT name FROM master.sys.databases;  #to get all database names
+
+SELECT * FROM tablename_1, tablename_2;  #multiple tables
+
+SELECT DISTINCT(column) FROM tablename;  #to get unique records
+
+SELECT column FROM tablename WHERE condition;  #can be added with AND and OR condition
+
+SELECT ocolumn FROM tablename WHERE column LIKE pattern;  #with % and _
+      LIKE '500%'  #values start with 500
+      LIKE '%500%'  #values have 500 in any position
+      LIKE '_77%'  #values x77xxx -> 277, 97738, 8770
+      LIKE '2_%_%'  #values start with 2 and at least 3 characters in length -> 284, 2539, 28501
+      LIKE '%2'  #values end with 2
+
+SELECT column_x FROM tablename ORDER BY column_y ASC/DESC
+
+SELECT * FROM tablename_1 LEFT/RIGHT JOIN tablename_2 ON conditions;
+
+INSERT INTO tablename (column_1, column_2,...) VALUES (value_1, value_2,...)
+
+UPDATE tablename SET column_1 = value_1, column_2 = value_2,... WHERE condition
+
+DELETE FROM tablename WHERE condition
