@@ -15,7 +15,6 @@ FROM Player
 ORDER BY player.[Full Name] ASC;
 GO
 
-
 CREATE DATABASE testdatabase;
 
 USE testdatabase;
