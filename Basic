@@ -57,8 +57,3 @@ INSERT INTO tablename (column_1, column_2,...) VALUES (value_1, value_2,...)
 UPDATE tablename SET column_1 = value_1, column_2 = value_2,... WHERE condition
 
 DELETE FROM tablename WHERE condition
-
-
-
-
-
