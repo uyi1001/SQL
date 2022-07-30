@@ -1,4 +1,4 @@
---basic select and calculation
+-- basic select clause, with calculaiton
 select first_name as 'first name',
 	last_name,
     points,
@@ -8,6 +8,7 @@ from customers;
 select name, unit_price, unit_price*1.1 as new_price
 from products;
 
+-- basic filter with where (and, or, not)
 select *
 from customers
 where not(birth_date <= '1990-01-01'
@@ -18,15 +19,18 @@ from order_items
 where order_id = 6
 and unit_price*quantity >30;
 
+-- filt with multiple conditions
 select *
 from products
 where quantity_in_stock in (49,38,72);
 
+-- between (inclusive)
 select *
 from customers
 where birth_date
 between '1990-01-01' and '2000-01-01';
 
+-- like and wildcard
 select *
 from customers
 where last_name like 'b%y';
@@ -39,10 +43,24 @@ select *
 from customers
 where phone like '%9';
 
+-- in can also be used
 select *
 from customers
 where first_name in ('elka','ambur');
 
+/*
+regexp:
+	regexp 'something' = like '%something%'
+    regexp 'sth1 | sth2' = in ('sth1', 'sth2')
+    regexp '^something' = like 'something%'
+    regexp 'something$' = like '%something'
+    regexp '[abc]sth' → asth/bsth/csth
+    regexp '[a-d]sth' → a~d + sth
+- ^ begin
+- $ end
+- | or
+- [] in
+*/
 select *
 from customers
 where last_name regexp 'EY$|ON$';
@@ -55,20 +73,25 @@ select *
 from customers
 where last_name regexp 'b[ru]';
 
+-- is null
 select *
 from orders
 where shipped_date is null;
 
+-- order by
 select *, quantity*unit_price as total_price
 from order_items
 where order_id = 2
 order by total_price desc;
 
+-- limit (always the last)
+-- * limit 6,3 means skip the first 6 results and show the next 3
 select *
 from customers
 order by points desc
 limit 3;
 
+-- join (inner join: intersection of two tables)
 select orders.order_id,product_id, quantity
 from orders
 join order_items
@@ -86,6 +109,7 @@ on o.product_id = p.product_id;
 
 use sql_hr;
 
+-- self joins
 select e.employee_id, e.first_name, m.first_name as manager
 from employees e
 join employees m
@@ -93,6 +117,7 @@ on e.reports_to = m.employee_id;
 
 use sql_store;
 
+-- join multiple tables
 select o.order_id, o.order_date, c.first_name, c.last_name, os.name as status
 from orders o
 join customers c
@@ -114,17 +139,20 @@ on p.payment_method = pm.payment_method_id;
 
 use sql_store;
 
+-- join a talbe with multiple primary keys
 select *
 from order_items oi
 join order_item_notes n
 on oi.order_id = n.order_id
 and oi.product_id = n.product_id;
 
+-- outer join (join table B to table A no matter if it's null in B)
 select p.product_id, p.name, oi.quantity
 from products p
 left join order_items oi
 on p.product_id = oi.product_id;
 
+-- outer join multiple talbes (the first one should be the most inclusive table)
 select c.customer_id, c.first_name, o.order_id, s.name as shipper
 from customers c
 left join orders o
@@ -133,6 +161,12 @@ left join shippers s
 on o.shipper_id = s.shipper_id
 order by c.customer_id;
 
+/*
+show order date, order id from orders table (original one)
+show customer name from customers table (using client id)
+show shipper name (no matter if it's shipped) from shippers table (outer jion on shipper id)
+show order status from status table (using status id)
+*/
 select o.order_date, o.order_id, c.first_name as customer, s.name as shipper, os.name as status
 from orders o
 join customers c
@@ -145,11 +179,13 @@ order by o.status, o.order_id;
 
 use sql_hr;
 
+-- self outer join (show manager info on the right including the manager itself)
 select e.employee_id, e.first_name, m.first_name
 from employees e
 left join employees m
 on e.reports_to = m.employee_id;
 
+-- using (instead of on xxx = xxx when column name is exactly the same)
 select o.order_date, o.order_id, c.first_name as customer, s.name as shipper, os.name as status
 from orders o
 join customers c
@@ -160,6 +196,7 @@ join order_statuses os
 on o.status = os.order_status_id
 order by o.status, o.order_id;
 
+-- using clause (with multiple primary keys)
 select *
 from order_items oi
 join order_item_notes oin
@@ -172,19 +209,23 @@ using (client_id)
 join payment_methods pm
 on p.payment_method = pm.payment_method_id;
 
+-- natural join (select by system)
 select *
 from orders o
 natural join customers c;
 
+-- cross join (useful when assigning size or colors to every product)
 select s.name as shipper, p.name as product
 from shippers s
 cross join products p
 order by s.name;
 
+-- implicit cross join
 select s.name as shipper, p.name as product
 from shippers s, products p
 order by s.name;
 
+-- union (connect rows with the same number of columns, column name will be the first "as ...")
 select order_id, order_date, 'Active' as status
 from orders
 where order_date >= '2019-01-01'
@@ -193,6 +234,14 @@ select order_id, order_date, 'Archived' as status
 from orders
 where order_date <= '2019-01-01';
 
+-- if select only one column and union, the result will be distinct
+select customer_id
+from orders
+union
+select customer_id
+from orders;
+
+-- the number of columns should be the same
 select order_id, customer_id
 from orders
 union
@@ -212,21 +261,26 @@ from customers
 where points > 3000
 order by first_name;
 
+-- insert rows
 insert into products (name, quantity_in_stock, unit_price)
 value ('product1', 12, 2.15),
 	  ('product2', 10, 1.87),
       ('product3', 19, 4.39);
 
+-- create table by copy paste (notice: there will be no PK and AI)
 create table orders_test as
 select * from orders;
 
+-- copy selected row to the table
 insert into orders_test
 select * from orders
 where order_id = 1;
 
-insert into orders_test
-select * from orders
-where order_id = 1;
+-- can by copied from other tables across databases as long as the number of column and attributes matched
+insert into orders_test (customer_id, order_date, status, comments, shipped_date, shipper_id)
+select client_id, invoice_date, '1', number, payment_date, invoice_id
+from sql_invoicing.invoices
+where invoice_date >= '2019-07-01';
 
 insert into orders_test (customer_id, order_date, status, comments, shipped_date, shipper_id)
 select customer_id, order_date, status, comments, shipped_date, shipper_id
@@ -251,14 +305,27 @@ join clients c
 using (client_id)
 where payment_date is not null;
 
+-- insert hierarchical rows into tow tables
+create table orders_test as
+select * from orders;
+create table order_items_test as
+select * from order_items;
+insert into orders_test (customer_id, order_date, status)
+values (1, '2019-01-02', 1);
+insert into order_items_test
+values (last_insert_id(), 1, 1, 2.95),
+	   (last_insert_id(), 2, 4, 3.18);
+
 use sql_store;
 
+-- update rows (un-check the "safe update" in MySQL preference first)
 update customers
 set points = points+50
 where birth_date < '1990-01-01';
 
 use sql_invoicing;
 
+-- update with subqueries
 update invoices
 set payment_total = invoice_total * 0.5, payment_date = due_date
 where client_id in (
@@ -278,6 +345,7 @@ where points > 3000
 
 use sql_invoicing;
 
+-- aggregate functions (returns only one result when use directly)
 select
 	'First half of 2019' as date_range,
     sum(invoice_total) as total_sales,
@@ -302,6 +370,7 @@ select
 from invoices
 where invoice_date between '2019-01-01' and '2019-12-31';
 
+-- group by
 select p.date as date, pm.name as payment_method, sum(p.amount) as total_payments
 from payments p
 join payment_methods pm
@@ -327,6 +396,7 @@ having order_sales > 100;
 
 use sql_invoicing;
 
+-- group by with rollup (only MySQL have this rollup sentence)
 select pm.name as payment_method, sum(p.amount) as total
 from payments p
 join payment_methods pm
@@ -335,6 +405,7 @@ group by pm.name with rollup;
 
 use sql_store;
 
+-- subqueries in where
 select *
 from products
 where unit_price > 
@@ -359,18 +430,21 @@ from order_items);
 
 use sql_invoicing;
 
+-- subqueries vs. join
+-- subquery
 select *
 from clients
 where client_id not in (
 	select distinct client_id
 	from invoices);
-
+-- join
 select * from clients
 left join invoices using(client_id)
 where invoice_id is null;
 
 use sql_store;
 
+-- subsubsub query
 select c.customer_id, first_name, last_name
 from customers c
 where customer_id in (
@@ -379,7 +453,7 @@ where customer_id in (
 		select order_id from order_items
 		where product_id = (
 			select product_id from products where name regexp 'lettuce')));
-
+-- join
 select distinct c.customer_id, c.first_name, c.last_name
 from customers c
 join orders
@@ -389,7 +463,7 @@ using (order_id)
 where product_id in (
 select product_id from products
 where name regexp 'lettuce');
-
+-- another subquery with join
 select distinct c.customer_id, c.first_name, c.last_name
 from customers c
 where customer_id in (
@@ -402,13 +476,33 @@ where customer_id in (
 
 use sql_invoicing;
 
+-- all
+-- select invoices that larger than client 3's every invoice
 select *
 from invoices
 where invoice_total > all (
 	select invoice_total
 	from invoices
 	where client_id = 3);
+-- is the same as:
+select *
+from invoices
+where invoice_total > (
+	select max(invoice_total)
+    from invoices
+    where client_id = 3
+    );
 
+-- any
+-- select the clients who have at least two invoices
+select *
+from clients
+where client_id = any(
+	select client_id
+    from invoices
+    group by client_id
+    having count(*) >=2);
+-- is the same as:
 select *
 from clients
 where client_id in(
@@ -419,12 +513,74 @@ where client_id in(
 
 use sql_hr;
 
+-- correlated subqueries
+-- the subquery refers to the outer query
 select *
 from employees e
 where salary > (
 	select avg(salary) as office_avg
 	from employees
 	where office_id = e.office_id);
+
+use sql_invoicing;
+
+select *
+from invoices i
+where invoice_total > (
+	select avg(invoice_total)
+    from invoices
+    where client_id = i.client_id);
+
+use sql_store;
+
+-- exists
+select *
+from products p
+where not exists(
+	select product_id
+    from order_items
+    where product_id = p.product_id);
+-- is the same as:
+-- however, exists creates a correlated subquery
+-- it's better to use exists when the subquery returns a huge list of results
+select *
+from products
+where product_id not in (
+	select product_id
+    from order_items);
+
+use sql_invoicing;
+
+-- subqueries in select clause
+-- if not "select" aggregate function, only one result will return
+-- alias should also be "select"
+select i.client_id, c.name, sum(invoice_total) as total_sales,
+	(select avg(invoice_total) from invoices) as average,
+    sum(invoice_total) - (select average) as difference
+from invoices i
+right join clients c
+using(client_id)
+group by client_id;
+-- is the same as:
+select client_id, name,
+	(select sum(invoice_total) from invoices
+		where client_id = c.client_id) as total_sales,
+	(select avg(invoice_total) from invoices) as average,
+    (select total_sales - average) as difference
+from clients c;
+
+-- subqueries in from clause
+-- must give the derived table an alias
+-- can use view instead (better)
+select max(difference) as max_difference, min(difference) as min_difference
+from (
+	select client_id, name,
+		(select sum(invoice_total) from invoices
+			where client_id = c.client_id) as total_sales,
+		(select avg(invoice_total) from invoices) as average,
+		(select total_sales - average) as difference
+	from clients c
+) as sales_summary
 
 
 
