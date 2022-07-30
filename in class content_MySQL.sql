@@ -341,6 +341,100 @@ where unit_price >
 	(select unit_price from products
     where name regexp 'Lettuce');
 
+use sql_hr;
+
+select employee_id, first_name, last_name
+from employees
+where salary >
+	(select avg(salary)
+    from employees);
+
+use sql_store;
+
+select *
+from products
+where product_id not in (
+select distinct product_id
+from order_items);
+
+use sql_invoicing;
+
+select *
+from clients
+where client_id not in (
+	select distinct client_id
+	from invoices);
+
+select * from clients
+left join invoices using(client_id)
+where invoice_id is null;
+
+use sql_store;
+
+select c.customer_id, first_name, last_name
+from customers c
+where customer_id in (
+	select customer_id from orders
+    where order_id in (
+		select order_id from order_items
+		where product_id = (
+			select product_id from products where name regexp 'lettuce')));
+
+select distinct c.customer_id, c.first_name, c.last_name
+from customers c
+join orders
+using (customer_id)
+join order_items
+using (order_id)
+where product_id in (
+select product_id from products
+where name regexp 'lettuce');
+
+select distinct c.customer_id, c.first_name, c.last_name
+from customers c
+where customer_id in (
+	select o.customer_id
+    from order_items oi
+    join orders o using (order_id)
+    where product_id = (
+		select product_id from products
+		where name regexp 'lettuce'));
+
+use sql_invoicing;
+
+select *
+from invoices
+where invoice_total > all (
+	select invoice_total
+	from invoices
+	where client_id = 3);
+
+select *
+from clients
+where client_id in(
+	select client_id
+	from invoices
+	group by client_id
+	having count(*) >=2);
+
+use sql_hr;
+
+select *
+from employees e
+where salary > (
+	select avg(salary) as office_avg
+	from employees
+	where office_id = e.office_id);
+
+
+
+
+
+
+
+
+
+
 
 
 
