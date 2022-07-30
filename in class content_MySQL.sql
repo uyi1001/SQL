@@ -1,3 +1,4 @@
+--basic select and calculation
 select first_name as 'first name',
 	last_name,
     points,
