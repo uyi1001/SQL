@@ -5,3 +5,151 @@ DROP SCHEMA IF EXISTS da_odl_user_696266_6788_dawd_schema CASCADE;
 CREATE SCHEMA IF NOT EXISTS da_odl_user_696266_6788_dawd_schema;
 DESCRIBE SCHEMA EXTENDED da_odl_user_696266_6788_dawd_schema;
 
+-- create table
+USE da_odl_user_696266_6788_dawd;
+CREATE OR REPLACE TABLE managed_table (width INT, length INT, height INT) USING DELTA;
+-- delta is the default
+INSERT INTO managed_table VALUES (3, 2, 1);
+SELECT * FROM managed_table;
+
+USE da_odl_user_696266_6788_dawd;
+DESCRIBE EXTENDED managed_table;
+
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE IF EXISTS managed_table;
+
+USE da_odl_user_696266_6788_dawd;
+CREATE TABLE external_table
+    LOCATION 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales';
+SELECT * FROM external_table;
+
+USE da_odl_user_696266_6788_dawd;
+DESCRIBE EXTENDED external_table;
+
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE IF EXISTS external_table;
+
+SELECT * FROM delta.`wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales`;
+
+USE da_odl_user_696266_6788_dawd;
+CREATE OR REPLACE VIEW high_sales AS
+    SELECT * FROM delta.`wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales` 
+        WHERE total_price > 10000;
+SELECT * FROM high_sales;
+
+USE da_odl_user_696266_6788_dawd;
+WITH sales_below_20000 AS
+    (SELECT *
+     FROM high_sales
+     WHERE total_price < 20000)
+    SELECT DISTINCT customer_name FROM sales_below_20000;
+    
+-- practice
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE IF EXISTS sales_external;
+CREATE TABLE sales_external USING DELTA
+    LOCATION 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales/';
+SELECT * FROM sales_external ORDER BY customer_id;
+
+USE da_odl_user_696266_6788_dawd;
+CREATE TABLE sales USING DELTA AS
+    SELECT * FROM sales_external;
+DESCRIBE EXTENDED sales;
+
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE sales_external;
+DESCRIBE EXTENDED sales_external;
+
+
+-- D2-02
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE IF EXISTS web_events_csv;
+CREATE TABLE web_events_csv 
+    USING csv 
+    OPTIONS (
+        path='wasb://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/web_events/web-events.csv',
+        header="true",
+        inferSchema="true"
+    );
+DROP TABLE IF EXISTS web_events;
+CREATE OR REPLACE TABLE web_events AS
+    SELECT * FROM web_events_csv;
+
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE IF EXISTS gym_logs;
+CREATE TABLE gym_logs (first_timestamp DOUBLE, gym Long, last_timestamp DOUBLE, mac STRING);
+COPY INTO gym_logs 
+    FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
+    FILEFORMAT = JSON
+    FILES = ('20191201_2.json');
+
+USE da_odl_user_696266_6788_dawd;
+COPY INTO gym_logs 
+    FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
+    FILEFORMAT = JSON
+    FILES = ('20191201_2.json');
+COPY INTO gym_logs
+    FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
+    FILEFORMAT = JSON
+    FILES = ('20191201_3.json');
+
+USE da_odl_user_696266_6788_dawd;
+SELECT count(*) FROM gym_logs;
+
+USE da_odl_user_696266_6788_dawd;
+COPY INTO gym_logs 
+    FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
+    FILEFORMAT = JSON
+    FILES = ('20191201_2.json');
+COPY INTO gym_logs
+    FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
+    FILEFORMAT = JSON
+    FILES = ('20191201_3.json');
+COPY INTO gym_logs 
+    FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
+    FILEFORMAT = JSON
+    PATTERN = '20191201_[0-9].json';
+
+-- practice
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE IF EXISTS customers_csv;
+CREATE TABLE customers_csv 
+    USING csv 
+    OPTIONS (
+        path='wasb://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/customers/customers.csv',
+        header="true",
+        inferSchema="true"
+);
+CREATE OR REPLACE TABLE customers AS
+    SELECT * FROM customers_csv;
+DROP TABLE customers_csv;
+SELECT * FROM customers;
+
+USE da_odl_user_696266_6788_dawd;
+SELECT count(*) FROM customers;
+
+USE da_odl_user_696266_6788_dawd;
+CREATE OR REPLACE TABLE sales_stream (5minutes STRING, 
+                                         clicked_items ARRAY<ARRAY<STRING>>, 
+                                         customer_id STRING, 
+                                         customer_name STRING, 
+                                         datetime STRING, 
+                                         hour BIGINT, 
+                                         minute BIGINT, 
+                                         number_of_line_items STRING, 
+                                         order_datetime STRING, 
+                                         order_number BIGINT, 
+                                         ordered_products ARRAY<ARRAY<STRING>>, 
+                                         sales_person DOUBLE, 
+                                         ship_to_address STRING
+);
+COPY INTO sales_stream 
+    FROM 'wasb://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales_stream.json'
+    FILEFORMAT = JSON;
+SELECT * FROM sales_stream ORDER BY customer_id;
+
+USE da_odl_user_696266_6788_dawd;
+GRANT SELECT ON TABLE `sales_stream` TO `users`;
+SHOW GRANT ON `sales_stream`;
+
+
