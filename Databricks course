@@ -1,42 +1,54 @@
 select current_user() as Username;
 
-/* just example, don't have the permission */
+-- just example, don't have the permission
+-- Create Schema
 DROP SCHEMA IF EXISTS da_odl_user_696266_6788_dawd_schema CASCADE;
 CREATE SCHEMA IF NOT EXISTS da_odl_user_696266_6788_dawd_schema;
 DESCRIBE SCHEMA EXTENDED da_odl_user_696266_6788_dawd_schema;
 
--- create table
+-- Create Table (managed table)
 USE da_odl_user_696266_6788_dawd;
 CREATE OR REPLACE TABLE managed_table (width INT, length INT, height INT) USING DELTA;
--- delta is the default
+-- optional 'using delta', delta is the default
 INSERT INTO managed_table VALUES (3, 2, 1);
 SELECT * FROM managed_table;
 
+-- View Table Information
 USE da_odl_user_696266_6788_dawd;
 DESCRIBE EXTENDED managed_table;
+-- 'describe extended' can only be used to view tables or views information
 
+-- DROP the Table
 USE da_odl_user_696266_6788_dawd;
 DROP TABLE IF EXISTS managed_table;
 
+-- Create Table (external table)
 USE da_odl_user_696266_6788_dawd;
 CREATE TABLE external_table
     LOCATION 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales';
 SELECT * FROM external_table;
 
+-- View Table Information
 USE da_odl_user_696266_6788_dawd;
 DESCRIBE EXTENDED external_table;
 
+-- DROP the Table
 USE da_odl_user_696266_6788_dawd;
 DROP TABLE IF EXISTS external_table;
 
+-- Dropping External Tables Does Not Delete Data
+-- The data files located in this location can be queried directly
 SELECT * FROM delta.`wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales`;
+DESCRIBE EXTENDED delta.`wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales`;
 
+-- Views
 USE da_odl_user_696266_6788_dawd;
 CREATE OR REPLACE VIEW high_sales AS
     SELECT * FROM delta.`wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/sales` 
         WHERE total_price > 10000;
 SELECT * FROM high_sales;
 
+-- Common Table Expressions
 USE da_odl_user_696266_6788_dawd;
 WITH sales_below_20000 AS
     (SELECT *
@@ -44,7 +56,7 @@ WITH sales_below_20000 AS
      WHERE total_price < 20000)
     SELECT DISTINCT customer_name FROM sales_below_20000;
     
--- practice
+-- practice D1
 USE da_odl_user_696266_6788_dawd;
 DROP TABLE IF EXISTS sales_external;
 CREATE TABLE sales_external USING DELTA
@@ -60,8 +72,7 @@ USE da_odl_user_696266_6788_dawd;
 DROP TABLE sales_external;
 DESCRIBE EXTENDED sales_external;
 
-
--- D2-02
+-- Ingesting Data
 USE da_odl_user_696266_6788_dawd;
 DROP TABLE IF EXISTS web_events_csv;
 CREATE TABLE web_events_csv 
@@ -71,18 +82,45 @@ CREATE TABLE web_events_csv
         header="true",
         inferSchema="true"
     );
+/* Set three options:
+path - the path to the object store
+header - whether or not the .csv file contains a header row
+inferSchema - whether or not Databricks should infer the schema from the contents of the file */
+-- the first table is an external csv
 DROP TABLE IF EXISTS web_events;
 CREATE OR REPLACE TABLE web_events AS
     SELECT * FROM web_events_csv;
+-- Create a second table in Delta format for most options.
+-- the second table is a managed delta
 
+
+USE da_odl_user_696266_6788_dawd;
+DROP TABLE IF EXISTS test222;
+CREATE TABLE test222
+    LOCATION 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs';
+SELECT * FROM test222;
+
+-- 314 records
+select * from json.`wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs`;
+
+-- Copy Into
 USE da_odl_user_696266_6788_dawd;
 DROP TABLE IF EXISTS gym_logs;
 CREATE TABLE gym_logs (first_timestamp DOUBLE, gym Long, last_timestamp DOUBLE, mac STRING);
+/* The second command copies data from an object store location into the gym_logs table.
+Note that the file type for the files in the object store location is specified as "JSON".
+The last part of the COPY INTO command is a file name, a list of file names, or a directory of files. */
 COPY INTO gym_logs 
     FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
     FILEFORMAT = JSON
     FILES = ('20191201_2.json');
 
+USE da_odl_user_696266_6788_dawd;
+SELECT * FROM gym_logs;
+-- three records
+
+/* We can run the same COPY INTO command as above and add a second one.
+The first one will be skipped because the file has already been loaded. */
 USE da_odl_user_696266_6788_dawd;
 COPY INTO gym_logs 
     FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
@@ -95,8 +133,10 @@ COPY INTO gym_logs
 
 USE da_odl_user_696266_6788_dawd;
 SELECT count(*) FROM gym_logs;
+-- added 2 rows from '20191201_03.json', now there are 5 records
 
 USE da_odl_user_696266_6788_dawd;
+-- these tow 'copy into' will be skipped
 COPY INTO gym_logs 
     FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
     FILEFORMAT = JSON
@@ -105,12 +145,26 @@ COPY INTO gym_logs
     FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
     FILEFORMAT = JSON
     FILES = ('20191201_3.json');
+-- The PATTERN option allows us to load any file that fits a specific pattern.
 COPY INTO gym_logs 
     FROM 'wasbs://courseware@dbacademy.blob.core.windows.net/data-analysis-with-databricks/v01/gym-logs'
     FILEFORMAT = JSON
     PATTERN = '20191201_[0-9].json';
 
--- practice
+USE da_odl_user_696266_6788_dawd;
+select * from gym_logs;
+
+-- Privileges (easier using Data Explorer)
+SHOW GRANT ON SCHEMA da_odl_user_696266_6788_dawd;
+
+-- GRANT
+GRANT USAGE ON SCHEMA da_odl_user_696266_6788_dawd TO `odl_user_696266@databrickslabs.com`;
+GRANT SELECT ON SCHEMA da_odl_user_696266_6788_dawd TO `users`;
+
+-- REVOKE
+REVOKE SELECT ON SCHEMA da_odl_user_696266_6788_dawd from `users`;
+
+-- practice D2
 USE da_odl_user_696266_6788_dawd;
 DROP TABLE IF EXISTS customers_csv;
 CREATE TABLE customers_csv 
@@ -124,8 +178,6 @@ CREATE OR REPLACE TABLE customers AS
     SELECT * FROM customers_csv;
 DROP TABLE customers_csv;
 SELECT * FROM customers;
-
-USE da_odl_user_696266_6788_dawd;
 SELECT count(*) FROM customers;
 
 USE da_odl_user_696266_6788_dawd;
@@ -151,5 +203,4 @@ SELECT * FROM sales_stream ORDER BY customer_id;
 USE da_odl_user_696266_6788_dawd;
 GRANT SELECT ON TABLE `sales_stream` TO `users`;
 SHOW GRANT ON `sales_stream`;
-
-
+REVOKE SELECT ON TABLE `sales_stream` from `users`;
