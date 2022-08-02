@@ -1,0 +1,7 @@
+select current_user() as Username;
+
+/* just example, don't have the permission */
+DROP SCHEMA IF EXISTS da_odl_user_696266_6788_dawd_schema CASCADE;
+CREATE SCHEMA IF NOT EXISTS da_odl_user_696266_6788_dawd_schema;
+DESCRIBE SCHEMA EXTENDED da_odl_user_696266_6788_dawd_schema;
+
