@@ -204,3 +204,20 @@ USE da_odl_user_696266_6788_dawd;
 GRANT SELECT ON TABLE `sales_stream` TO `users`;
 SHOW GRANT ON `sales_stream`;
 REVOKE SELECT ON TABLE `sales_stream` from `users`;
+
+
+
+
+-----------
+
+
+
+
+USE da_odl_user_696266_6788_dawd;
+DESCRIBE HISTORY customers;
+
+
+
+USE da_odl_user_696266_6788_dawd;
+UPDATE customers SET loyalty_segment = 10 WHERE loyalty_segment = 0;
+DESCRIBE HISTORY customers;
