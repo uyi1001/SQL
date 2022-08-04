@@ -205,19 +205,37 @@ GRANT SELECT ON TABLE `sales_stream` TO `users`;
 SHOW GRANT ON `sales_stream`;
 REVOKE SELECT ON TABLE `sales_stream` from `users`;
 
-
-
-
------------
-
-
-
-
+-- To check the history version
 USE da_odl_user_696266_6788_dawd;
 DESCRIBE HISTORY customers;
 
-
-
+-- Update the table and change back, check history again
 USE da_odl_user_696266_6788_dawd;
 UPDATE customers SET loyalty_segment = 10 WHERE loyalty_segment = 0;
 DESCRIBE HISTORY customers;
+
+USE da_odl_user_696266_6788_dawd;
+UPDATE customers SET loyalty_segment = 0 WHERE loyalty_segment = 10;
+DESCRIBE HISTORY customers;
+
+-- Time travel, select info from the version selected
+USE da_odl_user_696266_6788_dawd;
+SELECT loyalty_segment FROM customers VERSION AS OF 1;
+
+-- Merge into
+-- Insert new data without already matched data
+-- Copy into will skip existing rows but merge into will skip on matched record
+USE da_odl_user_696266_6788_dawd;
+MERGE INTO suppliers
+    USING source_suppliers
+    ON suppliers.SUPPLIER_ID = source_suppliers.SUPPLIER_ID
+    WHEN NOT MATCHED THEN INSERT *;
+SELECT count(*) FROM suppliers;
+
+
+
+
+
+
+
+
