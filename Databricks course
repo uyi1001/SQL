@@ -232,10 +232,115 @@ MERGE INTO suppliers
     WHEN NOT MATCHED THEN INSERT *;
 SELECT count(*) FROM suppliers;
 
+-- Lowercase every letter of city
+USE da_odl_user_696266_6788_dawd;
+SELECT lower(city) AS City FROM customers;
 
+-- lowercase the letters then capitalize the first one
+USE da_odl_user_696266_6788_dawd;
+SELECT initcap(lower(city)) AS City FROM customers;
 
+-- date setting
+USE da_odl_user_696266_6788_dawd;
+SELECT from_unixtime(promo_began, 'd MMM, y') AS Beginning_Date FROM promo_prices;
 
+-- date calculation
+USE da_odl_user_696266_6788_dawd;
+SELECT current_date() - to_date(from_unixtime(promo_began)) FROM promo_prices;
 
+-- Case... When
+USE da_odl_user_696266_6788_dawd;
+SELECT customer_name, loyalty_segment,
+    CASE 
+        WHEN loyalty_segment = 0 THEN 'Rare'
+        WHEN loyalty_segment = 1 THEN 'Occasional'
+        WHEN loyalty_segment = 2 THEN 'Frequent'
+        WHEN loyalty_segment = 3 THEN 'Daily'
+    END AS Loyalty 
+FROM customers;
 
+-- Update table
+USE da_odl_user_696266_6788_dawd;
+UPDATE customers SET city = initcap(lower(city));
+SELECT city FROM customers;
 
+-- Insert single row into a table
+USE da_odl_user_696266_6788_dawd;
+INSERT INTO loyalty_segments 
+    (loyalty_segment_id, loyalty_segment_description, unit_threshold, valid_from, valid_to)
+    VALUES
+    (4, 'level_4', 100, current_date(), Null);
+SELECT * FROM loyalty_segments;
 
+-- Insert an entire table despite duplication
+USE da_odl_user_696266_6788_dawd;
+INSERT INTO suppliers TABLE source_suppliers;
+SELECT * FROM suppliers;
+
+-- Insert overwrite, replaced all the rows
+USE da_odl_user_696266_6788_dawd;
+INSERT OVERWRITE suppliers TABLE source_suppliers;
+SELECT * FROM suppliers;
+
+-- Main: create table as, sub: select from
+USE da_odl_user_696266_6788_dawd;
+CREATE OR REPLACE TABLE high_loyalty_customers AS
+    SELECT * FROM customers WHERE loyalty_segment = 3;
+CREATE OR REPLACE TABLE low_loyalty_customers AS
+    SELECT * FROM customers WHERE loyalty_segment = 1;
+
+-- Intersection between customers and loyalty_segments on loyalty_segment
+USE da_odl_user_696266_6788_dawd;
+SELECT
+        customer_name,
+        loyalty_segment_description,
+        unit_threshold
+    FROM
+        customers
+    INNER JOIN loyalty_segments
+        ON customers.loyalty_segment = loyalty_segments.loyalty_segment_id;
+
+-- Cross Join
+USE da_odl_user_696266_6788_dawd;
+SELECT
+  "Sales", count(*)
+FROM
+  sales
+UNION ALL
+SELECT
+  "Customers", count(*)
+FROM
+  customers
+UNION ALL
+SELECT
+  "Crossed", count(*)
+FROM
+  customers
+  CROSS JOIN sales;
+
+-- Aggregations
+USE da_odl_user_696266_6788_dawd;
+SELECT 
+        "Sum" Function_Name, sum(units_purchased) AS Value
+    FROM customers 
+    WHERE state = 'CA'
+UNION ALL
+SELECT 
+        "Min", min(discounted_price) AS Lowest_Discounted_Price 
+    FROM promo_prices
+UNION ALL
+SELECT 
+        "Max", max(discounted_price) AS Highest_Discounted_Price 
+    FROM promo_prices
+UNION ALL
+SELECT 
+        "Avg", avg(total_price) AS Mean_Total_Price 
+    FROM sales
+UNION ALL
+SELECT 
+        "Standard Deviation", std(total_price) AS SD_Total_Price 
+    FROM sales
+UNION ALL
+SELECT 
+        "Variance", variance(total_price) AS Variance_Total_Price
+        FROM sales;
