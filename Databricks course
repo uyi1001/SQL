@@ -344,3 +344,5 @@ UNION ALL
 SELECT 
         "Variance", variance(total_price) AS Variance_Total_Price
         FROM sales;
+
+
