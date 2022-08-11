@@ -1,0 +1,11 @@
+Write a query to identify the names of users who placed less than 3 orders or ordered less than $500 worth of product.
+Example:
+Input:
+transactions table
+**Column**            Type
+id                INT
+user_id           INT
+created_at        Datetime
+product_id        INT
+quantity          INT
+
