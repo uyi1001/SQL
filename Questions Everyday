@@ -35,3 +35,26 @@ from (
   group by user_name) sub
 where tx_count<3 or total_prod_worth < 500;
 
+--用现有sql_store的数据：
+--quantity相关信息在order_items表格上，如果按上面方法，会根据order_items中order_id的出现个数筛选结果
+select distinct(customer_name) from(
+select o.customer_id, c.first_name as customer_name, sum(oi.quantity*unit_price) as total_order
+from orders o
+join order_items oi
+using (order_id)
+join customers c
+using (customer_id)
+group by o.customer_id
+having total_order < 80
+union
+select o.customer_id, c.first_name, count(o.order_id) as order_count from orders o
+join customers c using (customer_id)
+group by o.customer_id
+having order_count > 1) as customer_filter;
+
+
+
+
+
+
+
