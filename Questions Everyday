@@ -2,10 +2,36 @@ Write a query to identify the names of users who placed less than 3 orders or or
 Example:
 Input:
 transactions table
-**Column**            Type
+Column            Type
 id                INT
 user_id           INT
 created_at        Datetime
 product_id        INT
 quantity          INT
+
+users table
+Column            Type
+id                INT
+name              VARCHAR
+sex               VARCHAR
+
+products table
+Column            Type
+id                INT
+name              VARCHAR
+price             FLT
+
+Output:
+Column            Type
+users_less_than   VARCHAR
+
+Query:
+select distinct(user_name) as users_less_than
+from (
+  select u.name user_name, count(t.id) tx_count, SUM(quantity*price) total_prod_worth
+  from users u
+  left join transactions t on u.id = t.user_id
+  left join kproducts p on t.product_id = p.id
+  group by user_name) sub
+where tx_count<3 or total_prod_worth < 500;
 
