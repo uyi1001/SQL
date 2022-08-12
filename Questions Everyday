@@ -1,3 +1,4 @@
+--8.10
 Write a query to identify the names of users who placed less than 3 orders or ordered less than $500 worth of product.
 Example:
 Input:
@@ -68,6 +69,7 @@ order by customer_id) as sub
 where order_number >1 or total_order_amount < 80;
 
 
+--8.11
 
 
 
