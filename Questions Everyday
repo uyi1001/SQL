@@ -82,7 +82,7 @@ requester_id      INT
 requested_id      INT
 created_at        DATETIME
 
-friend accepts table
+friend_accepts table
 Column            Type
 accpetor_id       INT
 requester_id      INT
@@ -93,6 +93,11 @@ Column            Type
 acceptance_rate   FLT
 
 
+Query:
+Select cast( count(a.accetor_id)/count(r.requester_id) as decimal(5,4) ) as acceptance_rate
+from friend_requests r
+left join friend_accepts a
+on r.requester_id = a.requester_id and requested_id = accpetor_id
 
 
 
