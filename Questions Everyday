@@ -69,7 +69,31 @@ order by customer_id) as sub
 where order_number >1 or total_order_amount < 80;
 
 
---8.11
+--8.12
+We're given two tables. friend_requests holds all the friend requests made and friend_accepts is all of the acceptances.
+Write a query to find the overall acceptance rate of friend requests.
+Note: Round results to 4 decimal places.
+
+Example:
+Input:
+friend_requests table
+Column            Type
+requester_id      INT
+requested_id      INT
+created_at        DATETIME
+
+friend accepts table
+Column            Type
+accpetor_id       INT
+requester_id      INT
+created_at        DATETIME
+
+Output:
+Column            Type
+acceptance_rate   FLT
+
+
+
 
 
 
