@@ -100,5 +100,27 @@ left join friend_accepts a
 on r.requester_id = a.requester_id and requested_id = accpetor_id
 
 
+--8.15
+Write a query that creates an attribution rule for each user. If the user visited Facebook or Google at least onece then the attribution is labeled as "paid".
+Otherwise, the attribution is labeled as "organic".
+
+Example:
+Input:
+user_sessions table
+Column            Type
+created_at        DATETIME
+session_id        INT
+user_id           INT
+
+attribution table
+Column            Type
+session_id        INT
+channel           VARCHAR
+
+Output:
+Column            Type
+user_id           INT
+attribute         VARCHAR
+
 
 
