@@ -133,5 +133,24 @@ With tempr as(
     group by user_id)
 
 Select user_id, case when paid_count >= 1 then 'paid' else 'organic' end as attribute
-from tempr
+from tempr;
 
+--用现有sql_store的数据：
+-- select orders that have lettuce or foam
+With tempr as(
+	select
+		order_id,
+        sum(case when( name regexp 'lettuce|foam' ) then 1 else 0 end) as selected_prod
+        from (
+			select order_id, oi.product_id, quantity, oi.unit_price, name
+			from order_items oi
+			join products
+			using(product_id)
+            )as new_table
+		join orders o
+        using (order_id)
+        group by order_id)
+
+select order_id, case when selected_prod >= 1 then 'seleced' else 'non-selected' end as attribute
+from tempr
+order by order_id;
