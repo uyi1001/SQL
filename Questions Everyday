@@ -154,3 +154,56 @@ With tempr as(
 select order_id, case when selected_prod >= 1 then 'seleced' else 'non-selected' end as attribute
 from tempr
 order by order_id;
+
+
+--8.16
+We're given two tables, a table of notification_deliveries and a table of users with created and purchase conversion dates.
+If the user hasn't purchased then the conversion_date column is NULL.
+
+Write a query to get the distribution of total push notifications before a user converts.
+
+Example:
+Input:
+notification_deliveries table
+Column			Type
+notification		VARCHAR
+user_id			INT
+created_at		DATETIME
+
+users table
+Column			Type
+id			INT
+created_at		DATETIME
+conversion_date		DATETIME
+
+Output:
+Column			Type
+total_pushes		INT
+frequency		INT
+
+Query:
+Select total_pushes, count(*) as frequency
+from (
+	select u.id, count(nd.notification) as total_pushes
+	from users u
+	left join notification_deliveries nd
+	on u.id=nd.user_id and nd.created_at <= u.conversion_date
+	where u.conversion_date is not null
+	group by u.id
+	) as pushes
+group by total_pushes;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
