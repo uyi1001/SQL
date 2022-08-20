@@ -194,6 +194,38 @@ from (
 group by total_pushes;
 
 
+--8.19
+There are two tables. One table is called swipes that holds a row for every Tinder swipe and contains a boolean column that determines if the swipe was a righr or left swipe called is_right_swipe.
+The second is a table named variants that determines which user has which variant of an AB test.
+
+Write a SQL query to output the average number of right swipe for two different variants of a feed ranking algorithm by comparing users that have swiped the first 10, 50, and 100 swipes on their feed.
+
+Note: Users have to have swiped at least 10 times to be included in the subset of user to analyze the mean number of right swipes.
+
+Example:
+Input:
+swipes table
+Column			Type
+id			INT
+user_id			INT
+swiped_user_id		INT
+created_at		DATETIME
+is_right_swipe		BOOLEAN
+
+Column			Type
+id			INT
+experiment		VAR
+variant			VAR
+user_id			INT
+
+Output:
+Column			Type
+varient			VAR
+mean_right_swipes	FLT
+swipe_threshold		INT
+num_users		INT
+
+
 
 
 
