@@ -225,7 +225,26 @@ mean_right_swipes	FLT
 swipe_threshold		INT
 num_users		INT
 
-
+Query:
+With sample as
+	(select *,
+	row_number() over (partition by user_id order by created_at)as swipe_num
+	from swipes
+	order by created at),
+sample2 as
+	(select *,
+	sum(is_right_swipe) over (partition by user_id order by swipe_num) as swipe_count
+	from sample)
+Select
+	v.variant,
+	s.swipe_num as swipe_threshold,
+	avg(s.swipe_count) as mean_right_swipes,
+	count(s.user_id) as num_users
+from sample2 s
+left join variants v
+	using (user_id)
+where swipe_num in(10,50,100)
+group by v.variant, s.swipe_num;
 
 
 
