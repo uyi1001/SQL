@@ -247,6 +247,9 @@ where swipe_num in(10,50,100)
 group by v.variant, s.swipe_num;
 
 
+--8.21
+
+
 
 
 
