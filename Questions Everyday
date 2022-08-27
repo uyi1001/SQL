@@ -247,7 +247,16 @@ where swipe_num in(10,50,100)
 group by v.variant, s.swipe_num;
 
 
---8.21
+--8.26
+Query:
+Select num_conversations, count (*) as frequency
+from (
+	select user1, date(date), count(distinct user2) as num_conversations
+	from messages
+	where year(date) = '2020'
+	group by user1, date(date)
+	) as T
+group by num_conversations
 
 
 
