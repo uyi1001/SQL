@@ -248,6 +248,10 @@ group by v.variant, s.swipe_num;
 
 
 --8.26
+We have a table that represents the total number of messages sent between two users by date on messenger.
+
+1. What are some
+
 Query:
 Select num_conversations, count (*) as frequency
 from (
