@@ -73,3 +73,4 @@ Note: Print NULL when there are no more names corresponding to an occupation.
 Input Format
 
 The OCCUPATIONS table is described as follows:
+
