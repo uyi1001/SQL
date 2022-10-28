@@ -582,11 +582,6 @@ from (
 	from clients c
 ) as sales_summary
 
-
-
-
-
-
 -- subqueries in from clause
 -- must give the derived table an alias
 -- can use view instead (better)
@@ -600,7 +595,14 @@ from (
 	from clients c
 ) as sales_summary;
 
-
+-- Numeric Functions
+select round(5.73);
+select round(5.73, 1);
+select truncate(5.7468, 2); -- not round
+select ceiling(7.2); -- return the smallest int >= this number
+select floor(8.4); -- return the largest int <= this number
+select abs(-10.4);
+select rand();
 
 
 
