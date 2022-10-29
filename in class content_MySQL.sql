@@ -604,6 +604,43 @@ select floor(8.4); -- return the largest int <= this number
 select abs(-10.4);
 select rand();
 
+-- String Function
+select length('abc');
+select length('A B C');
+select length('I love you');
+select upper('where are you');
+select lower('Sky');
+select ltrim('     what are you');
+select length(rtrim('  abc    '));
+select length(trim('   I love you    '));
+select left('Kindergarten', 4);
+select right('Kindergarten', 6);
+select substring('Kingdergarten', 3, 4);
+select substring('I love you', 2, 7);
+select locate('n', 'Kindergarten');
+select locate('app', 'whatsapp');
+select replace('whatsapp', 'a', 'b');
+select replace('Kindergarten', 'garten', 'Nape');
+select concat('abc', ' ', 'def');
+
+use sql_store;
+select concat(first_name, ' ', last_name) as full_name from customers;
+
+-- Date Function
+select now(), curdate(), curtime();
+select year(now()), month(now()), day(now()),
+	hour(now()), minute(now()), second(now());
+select year('2019-01-01');
+select dayname(now()), monthname(now());
+select extract(year from now()), extract(month from now());
+
+select * from orders
+where year(order_date) >= year(now());
+-- remember to compare year() with year()
+
+-- Formatting Dates and Times
+select date_format('2022-01-02', '%M-%D %Y');
+select date_format(now(),'%m %d %y');
 
 
 
