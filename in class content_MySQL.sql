@@ -641,7 +641,8 @@ where year(order_date) >= year(now());
 -- Formatting Dates and Times
 select date_format('2022-01-02', '%M-%D %Y');
 select date_format(now(),'%m %d %y');
-
+-- search 'mysql date format string' for more formation
+select time_format(now(), '%H:%i %p');
 
 
 
