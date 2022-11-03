@@ -644,7 +644,9 @@ select date_format(now(),'%m %d %y');
 -- search 'mysql date format string' for more formation
 select time_format(now(), '%H:%i %p');
 
-
+-- Calculating Dates and Times
+select date_add(now(), interval 1 day);
+select date_add(now(), interval 1 month);
 
 
 
