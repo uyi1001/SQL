@@ -646,7 +646,23 @@ select time_format(now(), '%H:%i %p');
 
 -- Calculating Dates and Times
 select date_add(now(), interval 1 day);
-select date_add(now(), interval 1 month);
+select date_add(now(), interval -1 month);
+select date_sub(now(), interval 1 year);
+select datediff('2019-01-05', '2022-09-30');
+select datediff('2022-10-28', '2022-10-22');
+select time_to_sec('14:13');
+select time_to_sec('14:13') - time_to_sec('14:00');
+
+-- Ifnull and coalesce
+select order_id,
+	ifnull(shipper_id, 'Not assigned') as shipper
+from orders;
+select order_id,
+	coalesce(shipper_id, comments, order_date, 'Not assigned') as shipper
+from orders;
+-- coalesce returns the first non-null value in the list
+select concat(first_name, " ", last_name) as customer_name, ifnull(phone, 'Unknown') as phonenumber
+from customers;
 
 
 
