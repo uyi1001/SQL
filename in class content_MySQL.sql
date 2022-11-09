@@ -664,5 +664,21 @@ from orders;
 select concat(first_name, " ", last_name) as customer_name, ifnull(phone, 'Unknown') as phonenumber
 from customers;
 
+-- if function
+select order_id, order_date,
+	if(year(order_date) = year(now()), 'Active', 'Archived') as category
+from orders;
+select order_id, order_date,
+	if(year(order_date) = '2019', 'Active', 'Archived') as category
+from orders;
+select
+	product_id,
+    name,
+    count(product_id) as orders,
+    if(count(product_id) > 1, 'Many times', 'Once') as frequency
+from products
+join order_items
+using (product_id)
+group by product_id;
 
 
