@@ -700,3 +700,4 @@ select
         else 'Bronze'
 	end as category
 from customers;
+
