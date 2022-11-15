@@ -701,3 +701,28 @@ select
 	end as category
 from customers;
 
+-- Creating Views
+create view sales_by_client as
+select
+	c.client_id,
+    c.name,
+    sum(invoice_total) as total_sales
+from clients c
+join invoices i using (client_id)
+group by client_id, name;
+
+select * from sales_by_client
+where total_sales > 500
+order by total_sales desc;
+
+select * from sales_by_client
+join clients using (client_id);
+
+create view balance_by_client as
+select
+	c.client_id,
+	c.name,
+	sum(invoice_total)-sum(payment_total) as balance
+from clients c
+join invoices i using (client_id)
+group by client_id, name
