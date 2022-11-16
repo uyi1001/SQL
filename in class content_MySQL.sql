@@ -726,3 +726,5 @@ select
 from clients c
 join invoices i using (client_id)
 group by client_id, name
+
+
