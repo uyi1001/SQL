@@ -727,4 +727,16 @@ from clients c
 join invoices i using (client_id)
 group by client_id, name
 
+-- Altering or Dropping Views
+drop view sales_by_client;
 
+create or replace view sales_by_client as
+select
+	c.client_id,
+    c.name,
+    sum(invoice_total) as total_sales
+from clients c
+join invoices i using (client_id)
+group by client_id, name;
+-- or click the spanner icon beside the view to rewrite query
+select * from sales_by_client;
