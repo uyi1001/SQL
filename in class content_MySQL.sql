@@ -740,3 +740,5 @@ join invoices i using (client_id)
 group by client_id, name;
 -- or click the spanner icon beside the view to rewrite query
 select * from sales_by_client;
+
+
