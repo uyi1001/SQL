@@ -742,6 +742,7 @@ group by client_id, name;
 select * from sales_by_client;
 
 -- Updatable Views
+-- can update the base table from view
 create or replace view invoices_with_balance as
 select
 	invoice_id,
@@ -758,8 +759,16 @@ where (invoice_total - payment_total) > 0;
 select * from invoices_with_balance;
 -- this is a view without DISTINCT, AGGREGATE FUNCTIONS, GROUP BY/HAVING or UNION
 -- it is an updatable view
+
 delete from invoices_with_balance
 where invoice_id = 2;
+-- cannot delete since this id is linked to another table with a foreign key setting restrict delete
+-- can delete where invoice_id = 1, 3, 4... since the payment table doesn't have these ids
+
 update invoices_with_balance
 set due_date = date_add(due_date, interval 2 day)
-where invoice_id = 8;
+where invoice_id = 2;
+
+delete from sales_by_client
+where client_id = 5;
+-- with aggregate functions (sum of invoice_total), the view is not updatable
