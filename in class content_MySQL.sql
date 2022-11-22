@@ -741,4 +741,25 @@ group by client_id, name;
 -- or click the spanner icon beside the view to rewrite query
 select * from sales_by_client;
 
-
+-- Updatable Views
+create or replace view invoices_with_balance as
+select
+	invoice_id,
+    number,
+    client_id,
+    invoice_total,
+    payment_total,
+    invoice_total - payment_total as balance,
+    invoice_date,
+    due_date,
+    payment_date
+from invoices
+where (invoice_total - payment_total) > 0;
+select * from invoices_with_balance;
+-- this is a view without DISTINCT, AGGREGATE FUNCTIONS, GROUP BY/HAVING or UNION
+-- it is an updatable view
+delete from invoices_with_balance
+where invoice_id = 2;
+update invoices_with_balance
+set due_date = date_add(due_date, interval 2 day)
+where invoice_id = 8;
