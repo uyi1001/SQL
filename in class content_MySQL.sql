@@ -800,12 +800,14 @@ where invoice_id = 3;
 
 -- Creating a Stored Procedure
 delimiter $$
+-- Set delimiter since use ; in the body of the procedure
 create procedure get_clients()
 begin
 	select * from clients;
     -- Have to add ";", even there's only one statement (MySQL only)
 end$$
 delimiter ;
+-- Set back to ;
 call get_clients();
 
 delimiter $$
