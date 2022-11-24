@@ -808,7 +808,34 @@ end$$
 delimiter ;
 call get_clients();
 
+delimiter $$
+create procedure get_invoices_with_balance()
+begin
+	select
+		invoice_id,
+		number,
+		client_id,
+		invoice_total,
+		payment_total,
+		invoice_total - payment_total as balance,
+		invoice_date,
+		due_date,
+		payment_date
+	from invoices
+	where (invoice_total - payment_total) > 0;
+end$$
+delimiter ;
+call get_invoices_with_balance;
 
+delimiter $$
+create procedure get_invoices_with_balance_from_view()
+begin
+	select *
+    from invoices_with_balance
+    where balance > 0;
+end $$
+delimiter ;
+call get_invoices_with_balance_from_view;
 
 
 
