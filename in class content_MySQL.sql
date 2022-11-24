@@ -798,7 +798,15 @@ set payment_total = invoice_total
 where invoice_id = 3;
 -- Error: will prevent the update since the third row will no longer appear in the View
 
-
+-- Creating a Stored Procedure
+delimiter $$
+create procedure get_clients()
+begin
+	select * from clients;
+    -- Have to add ";", even there's only one statement (MySQL only)
+end$$
+delimiter ;
+call get_clients();
 
 
 
