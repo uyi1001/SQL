@@ -846,4 +846,3 @@ call get_invoices_with_balance_from_view;
 
 
 
-
