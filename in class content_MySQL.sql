@@ -840,6 +840,84 @@ delimiter ;
 call get_invoices_with_balance_from_view;
 
 -- Creating Procedures Using MySQL Workbench
+-- Right click Stored Procedures and Create... then Apply
+call get_payments;
+
+-- Drop Stored Procedures
+drop procedure get_payments;
+call get_payments;
+drop procedure if exists get_payments;
+
+-- Parameters
+drop procedure if exists get_clients_by_state;
+
+delimiter $$
+create procedure get_clients_by_state
+(
+	state CHAR(2)
+)
+begin
+	select * from clients c
+    where c.state = state;
+end $$
+delimiter ;
+call get_clients_by_state('CA');
+call get_client_by_state(); -- error
+
+delimiter $$
+create procedure get_invoices_by_client
+(
+	client_id int
+)
+begin
+	select * from invoices i
+    where i.client_id = client_id;
+end $$
+delimiter ;
+call get_invoices_by_client(3);
+
+-- Parameters with Default Value
+drop procedure if exists get_clients_by_state;
+
+delimiter $$
+create procedure get_clients_by_state
+(
+	state CHAR(2)
+)
+begin
+	if state is null then
+		set state = 'CA';
+	End if;
+	select * from clients c
+    where c.state = state;
+end $$
+delimiter ;
+call get_clientsclientsclients_by_state(null);
+
+delimiter $$
+create procedure get_clients_by_state
+(
+	state CHAR(2)
+)
+begin
+   	select * from clients c
+	where c.state = ifnull(state, c.state);
+end $$
+delimiter ;
+
+delimiter $$
+create procedure get_payments
+(
+	client_id int,
+	payment_method_id tinyint
+)
+begin
+	select * from payments p
+    where
+		p.client_id = ifnull(client_id, p.client_id) and
+		p.payment_method = ifnull(payment_method_id, p.payment_method);
+end $$
+delimiter ;
 
 
 
