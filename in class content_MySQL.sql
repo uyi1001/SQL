@@ -839,7 +839,7 @@ end $$
 delimiter ;
 call get_invoices_with_balance_from_view;
 
-
+-- Creating Procedures Using MySQL Workbench
 
 
 
