@@ -919,7 +919,117 @@ begin
 end $$
 delimiter ;
 
+-- Parameter Validation
+delimiter $$
+create procedure make_payment
+(
+	invoice_id int,
+    payment_amount decimal(9,2),
+    payment_date date
+)
+begin
+	if payment_amount <= 0 then
+		signal sqlstate '22003'
+			set message_text = 'Invalid payment amount';
+	end if;
+	update invoices i
+    set
+		i.payment_total = payment_amount,
+        i.payment_date = payment_date
+	where i.invoice_id = invoice_id;
+end $$
+delimiter ;
+call sql_invoicing.make_payment(2, -100, '2019-01-01'); -- store -100 into the database, call error
+select * from invoices;
 
+-- Output Parameters
+delimiter $$
+create procedure get_unpaid_invoices_for_client
+(
+	client_id int,
+    OUT invoices_count int,
+    OUT invoices_total decimal(9,2)
+)
+begin
+	select count(*), sum(invoice_total)
+    into invoices_count, invoices_total
+    from invoices i
+    where i.client_id = client_id
+		and payment_total = 0;
+end $$
+delimiter ;
+set @invoices_count = 0;
+set @invoices_total = 0;
+call sql_invoicing.get_unpaid_invoices_for_client(3, @invoices_count, @invoices_total);
+select @invoices_count, @invoices_total;
+
+delimiter $$
+create procedure get_unpaid_invoices_for_client
+(
+	client_id int
+)
+begin
+	select count(*) as invoices_count, sum(invoice_total) as invoices_total
+    from invoices i
+    where i.client_id = client_id
+		and payment_total = 0;
+end $$
+delimiter ;
+call sql_invoicing.get_unpaid_invoices_for_client(3);
+
+-- User or Session Variables
+-- variables will be stored during online session, when disconnected, they will be cleared
+-- Local Variables, cleared after the procedures are done, using declare
+delimiter $$
+create procedure get_risk_factor()
+begin
+	declare risk_factor decimal(9,2) default 0;
+    declare invoices_total decimal(9,2);
+    declare invoices_count int;
+    
+    select count(*), sum(invoice_total)
+    into invoices_count, invoices_total
+    from invoices i;
+-- risk factor = invoices_total / invoices_count * 5
+	set risk_factor = invoices_total/invoices_count*5;
+    select risk_factor;
+end $$
+delimiter ;
+
+-- Functions
+-- create own functions, only can return single value, not like procedures can return result sets of multiple rows and columns
+-- right click on functions and create function
+delimiter $$
+CREATE FUNCTION get_risk_factor_for_client
+(
+	client_id int
+)
+RETURNS decimal(9,2)
+/* deterministic -- result is set to the same as input the same parameter
+reads sql data
+modifies sql data */
+reads sql data
+BEGIN
+	declare risk_factor decimal(9,2) default 0;
+    declare invoices_total decimal(9,2);
+    declare invoices_count int;
+    
+    select count(*), sum(invoice_total)
+    into invoices_count, invoices_total
+    from invoices i
+    where i.client_id = client_id;
+
+	set risk_factor = invoices_total/invoices_count*5;
+    RETURN ifnull(risk_factor, 0);
+END $$
+delimiter ;
+select
+	client_id,
+    name,
+    get_risk_factor_for_client(client_id) as risk_factor
+from clients;
+
+drop function get_risk_factor_for_client;
 
 
 
