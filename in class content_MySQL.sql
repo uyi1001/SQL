@@ -1031,6 +1031,15 @@ from clients;
 
 drop function get_risk_factor_for_client;
 
+-- Transactions
+	/* ACID properties
+    Atomicity
+    Consistency
+    Isolation
+    Durability
+    */
+
+-- Creating Trasactions
 
 
 
