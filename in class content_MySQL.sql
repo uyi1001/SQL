@@ -1044,3 +1044,6 @@ drop function get_risk_factor_for_client;
 
 
 
+
+
+
